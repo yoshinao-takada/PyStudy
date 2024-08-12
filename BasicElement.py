@@ -32,7 +32,10 @@ class BasicElement(object):
         elif self.mytype == ElementType.Inductance:
             y = s * self.c + 1 / (self.r + s * self.l)
         elif self.mytype == ElementType.Capacitance:
-            y = self.g + 1/(self.r + s * self.l + 1/(s * self.c))
+            sc = s * self.c
+            if (abs(sc) < 1e-9):
+                sc = 0 + 1e-9j
+            y = self.g + sc / ((self.r + s * self.l) * sc + 1)
         return y
     
     """Admittance or impedance matrix of series or shunt 2-port network

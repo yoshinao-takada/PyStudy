@@ -10,22 +10,14 @@ class NwConv(object):
     """Constructor accepts zp as a scalar number or 1-D vector of
         float or complex. The number or numbers represent ports'
         characteristic impedances."""
-    def __init__(self, zp, ports:int = 2):
-        self.szp = object   # sqrt of port impedances
-        self.syp = object   # sqrt of port admittances
-        self.i = np.identity(ports, complex)     # identity matrix
-        if (type(zp)==complex) or (type(zp)==float) or (type(zp) == int) :
-            # if zp is a scalar characteristic impedance common to all the ports.
-            self.szp = np.asmatrix(self.i * math.sqrt(zp))
-            self.syp = np.asmatrix(self.i / math.sqrt(zp))
-        elif (type(zp)==np.ndarray) and (len(zp.shape) == 1):
-            # if zp is a vector of port characteristic impedances.
-            self.i = np.identity(len(zp), complex)
-            self.szp = np.identity(len(zp), complex)
-            self.syp = np.identity(len(zp), complex)
-            for i in range(len(zp)):
-                self.szp[i,i] = math.sqrt(zp[i])
-                self.syp[i,i] = math.sqrt(1.0/zp[i])
+    def __init__(self, zp: np.ndarray):
+        ports = len(zp)
+        self.szp = np.identity(len(zp), complex)
+        self.syp = np.identity(len(zp), complex)
+        self.i = np.identity(ports, complex)
+        for i in range(len(zp)):
+            self.szp[i,i] = math.sqrt(zp[i])
+            self.syp[i,i] = math.sqrt(1.0/zp[i])
     
     """It converts a scattering matrix to an admittance matrix."""
     def s2y(self, s: np.ndarray):
@@ -104,7 +96,7 @@ class NwConv(object):
 
     """It converts an array of scattering matrices
         to an array of admittance matrices."""
-    def sa2ya(self, sa: np.ndarray):
+    def s2ySeries(self, sa: np.ndarray):
         ya = np.zeros(sa.shape, complex)
         for index in range(sa.shape[0]):
             ya[index] = self.s2y(sa[index])
@@ -112,7 +104,7 @@ class NwConv(object):
     
     """It convers an array of admittance matrices
         to an array of scattering matrices."""
-    def ya2sa(self, ya: np.ndarray):
+    def y2sSeries(self, ya: np.ndarray):
         sa = np.zeros(ya.shape, complex)
         for index in range(ya.shape[0]):
             sa[index] = self.y2s(ya[index])
@@ -120,7 +112,7 @@ class NwConv(object):
     
     """It converts an array of scattering matrices
         to an array of impedance matrices."""
-    def sa2za(self, sa: np.ndarray):
+    def s2zSeries(self, sa: np.ndarray):
         za = np.zeros(sa.shape, complex)
         for index in range(sa.shape[0]):
             za[index] = self.s2z(sa[index])
@@ -128,16 +120,26 @@ class NwConv(object):
     
     """It converts an array of impedacne matrices
         to an array of scattering matrices."""
-    def za2sa(self, za: np.ndarray):
+    def z2sSeries(self, za: np.ndarray):
         sa = np.zeros(za.shape, complex)
         for index in range(za.shape[0]):
             sa[index] = self.z2s(za[index])
         return sa
     
+    """It converts an array of transport matrices
+        to an array of scattering matrices."""
+    def t2sSeries(self, ta: np.ndarray):
+        sa = np.zeros(ta.shape, complex)
+        for index in range(ta.shape[0]):
+            sa[index] = self.t2s(ta[index])
+        return sa
+    
     """It converts an array of scattering matrices
-        to an array of impedance matrices."""
-    def sa2za(self, sa: np.ndarray):
-        za = np.zeros(sa.shape, complex)
+        to an array of transport matrices."""
+    def s2tSeries(self, sa: np.ndarray):
+        ta = np.zeros(sa.shape, complex)
         for index in range(sa.shape[0]):
-            za[index] = self.s2z(sa[index])
-        return za
+            ta[index] = self.s2t(sa[index])
+        return ta
+    
+    
