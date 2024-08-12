@@ -27,7 +27,111 @@ class FreqUnit(Enum):
     kHz = 1
     MHz = 2
     GHz = 3
+
+class Parameter(Enum):
+    S = 0
+    Y = 1
+    Z = 2
+    H = 3
+    G = 4
 #endregion ENUM_DEFS
+class TSOpt(object):
+    DicFreqUnit = {
+        FreqUnit.Hz : "Hz",
+        FreqUnit.kHz : "kHz",
+        FreqUnit.MHz : "MHz",
+        FreqUnit.GHz : "GHz"
+    }
+
+    DicParameter = {
+        Parameter.S : "S",
+        Parameter.Y : "Y",
+        Parameter.Z : "Z",
+        Parameter.H : "H",
+        Parameter.G : "G"
+    }
+
+    DicFormat = {
+        ComplexFormat.dB : "DB",
+        ComplexFormat.MA : "MA",
+        ComplexFormat.RI : "RI",
+    }
+
+    """
+    Constructor sets default values.
+    """
+    def __init__(self):
+        self.fu: FreqUnit = FreqUnit.GHz
+        self.pa: Parameter = Parameter.S
+        self.cf: ComplexFormat = ComplexFormat.MA
+        self.r: float = 50
+
+    """
+    Parse an option line.
+    """
+    def parse(self, str: str):
+        if (str[0] != '#'):
+            raise("Not an option line")
+        options = FmtConf.splitEx(str)
+        nextRVal:bool = False
+        for opt in options:
+            if opt == "Hz":
+                self.fu = FreqUnit.Hz
+                nextRVal = False
+            elif opt == "kHz":
+                self.fu = FreqUnit.kHz
+                nextRVal = False
+            elif opt == "MHz":
+                self.fu = FreqUnit.MHz
+                nextRVal = False
+            elif opt == "GHz":
+                self.fu = FreqUnit.GHz
+                nextRVal = False
+            elif opt == "S":
+                self.pa = Parameter.S
+                nextRVal = False
+            elif opt == "Y":
+                self.pa = Parameter.Y
+                nextRVal = False
+            elif opt == "Z":
+                self.pa = Parameter.Z
+                nextRVal = False
+            elif opt == "H":
+                self.pa = Parameter.H
+                nextRVal = False
+            elif opt == "G":
+                self.pa = Parameter.G
+                nextRVal = False
+            elif opt == "DB":
+                self.cf = ComplexFormat.dB
+                nextRVal = False
+            elif opt == "MA":
+                self.cf = ComplexFormat.MA
+                nextRVal = False
+            elif opt == "RI":
+                self.cf = ComplexFormat.RI
+                nextRVal = False
+            elif opt == "R":
+                nextRVal = True
+            elif nextRVal:
+                self.r = float(opt)
+            else:
+                pass
+    
+    """
+    Format an option line.
+    """
+    def format(self) -> str:
+        elements = ["#"]
+        elements.append(self.DicFreqUnit[self.fu])
+        elements.append(self.DicParameter[self.pa])
+        elements.append(self.DicFormat[self.cf])
+        elements.append("R")
+        elements.append(str(self.r))
+        return " ".join(elements)
+
+
+
 
 class CFmt(object):
     RAD2DEG_COEFF: float = 180.0 / math.pi
