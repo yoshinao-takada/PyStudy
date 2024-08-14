@@ -11,6 +11,7 @@ import numpy as np
 class TwoPortDataOrder(Enum):
     Classic = 0 # 21_12
     Modern = 1  # 12_21
+    Undefined = 2
 
 class MatrixFormat(Enum):
     Full = 0
@@ -74,6 +75,7 @@ class TSOpt(object):
             raise("Not an option line")
         options = FmtConf.splitEx(str)
         nextRVal:bool = False
+        self.r = -1
         for opt in options:
             if opt == "Hz":
                 self.fu = FreqUnit.Hz
@@ -126,12 +128,10 @@ class TSOpt(object):
         elements.append(self.DicFreqUnit[self.fu])
         elements.append(self.DicParameter[self.pa])
         elements.append(self.DicFormat[self.cf])
-        elements.append("R")
-        elements.append(str(self.r))
+        if self.r > 0:
+            elements.append("R")
+            elements.append(str(self.r))
         return " ".join(elements)
-
-
-
 
 class CFmt(object):
     RAD2DEG_COEFF: float = 180.0 / math.pi

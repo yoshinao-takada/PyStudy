@@ -5,6 +5,7 @@ Network parameter conversion among S, T, Y, and Z.
 import numpy as np
 import math
 import Submat as sm
+import cmath
 
 class NwConv(object):
     """Constructor accepts zp as a scalar number or 1-D vector of
@@ -142,4 +143,16 @@ class NwConv(object):
             ta[index] = self.s2t(sa[index])
         return ta
     
+    @staticmethod
+    def magSeries(ma:np.ndarray, row:int, column:int):
+        mag = np.zeros(ma.shape[0])
+        for i in range(len(mag)):
+            mag[i] = abs(ma[i, row, column])
+        return mag
     
+    @staticmethod
+    def phaseSeries(ma:np.ndarray, row:int, column:int):
+        phase = np.zeros(ma.shape[0])
+        for i in range(len(phase)):
+            phase[i] = cmath.phase(ma[i, row, column])
+        return phase
